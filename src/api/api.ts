@@ -6,7 +6,7 @@ const app = express();
 import cors from 'cors';
 import { PrismaClient, Prisma, BorrowDetails, Library, Students } from '@prisma/client';
 import { ConvertBigIntObjects, ConvertBigIntObject } from '../bigIntConvert';
-import { getBookInfo } from '../PrivateBookAPI/getBookInfo';
+// import { getBookInfo } from '../PrivateBookAPI/getBookInfo';
 const prisma = new PrismaClient();
 //Using bodyparser
 app.use(bodyParser.urlencoded({ extended: true}));
@@ -85,7 +85,7 @@ app.get('/staffPermissions', async (req: Request, res: Response) => {
     const staff = await prisma.permissions.findUnique({
         //Find unique staff member where ID = passed ID from params
         where: {
-            ID: ID,
+            // ID: ID,
         },
     })
     .then((staff) => {
@@ -152,27 +152,51 @@ app.get('/students', async (req: Request, res: Response) => {
 
 });
 
-app.get('/staff', async (req: Request, res: Response) => {
-    //Call prismas findMany method on students
-    const staff = await prisma.staff.findMany()
-    .then((staff) => {
-        console.log(staff);
-        res.status(200).send(staff);
-    })
-    .catch((e) => {
-        res.status(500).send(e.message);
-    });
+// app.get('/staff', async (req: Request, res: Response) => {
+//     //Call prismas findMany method on students
+//     const staff = await prisma.staff.findMany()
+//     .then((staff) => {
+//         console.log(staff);
+//         res.status(200).send(staff);
+//     })
+//     .catch((e) => {
+//         res.status(500).send(e.message);
+//     });
 
+// });
+
+app.post('/login',(req, res) => {
+    let libId = req.body.id;
+    let pass = req.body.pass;
+
+    const member = prisma.staff.findUnique({
+        where: {
+            ID: libId,
+            password: pass,
+        },
+    })
+    .then(() => {
+        res.redirect('/');
+    })
+    .catch(() => {
+        res.redirect('/');
+    });
 });
 
-// app.post('/login',(req, res) => {
-//     let libId = req.body.id;
-//     let pass = req.body.pass;
-
-//     const member = prisma.staff.findUnique({
+// app.post('/updateStudent',(req: Request, res: Response) => {
+    
+//     //Call prismas update method on students
+//     const updateUser = prisma.students.update({
+//         //By email
 //         where: {
-//             ID: libId,
-//             password: pass,
+//             Email: req.body.email
+//         },
+//         //Lazy replace everything
+//         data: {
+//             FirstName: req.body.firstName,
+//             LastName: req.body.lastName,
+//             Email: req.body.email,
+//             PhoneNumber: req.body.phone,
 //         },
 //     })
 //     .then(() => {
@@ -181,69 +205,45 @@ app.get('/staff', async (req: Request, res: Response) => {
 //     .catch(() => {
 //         res.redirect('/');
 //     });
+
 // });
 
-app.post('/updateStudent',(req: Request, res: Response) => {
-    
-    //Call prismas update method on students
-    const updateUser = prisma.students.update({
-        //By email
-        where: {
-            Email: req.body.email
-        },
-        //Lazy replace everything
-        data: {
-            FirstName: req.body.firstName,
-            LastName: req.body.lastName,
-            Email: req.body.email,
-            PhoneNumber: req.body.phone,
-        },
-    })
-    .then(() => {
-        res.redirect('/');
-    })
-    .catch(() => {
-        res.redirect('/');
-    });
+// //Update book
+// app.post('/updateBook', async(req: Request, res: Response) => {
+//     //Convert to bigint
+//     let ISBN = BigInt(parseInt((req.body.isbn).toString()));
+//     let ISBN2 = BigInt(parseInt((req.body.isbn2).toString()));
+//     //Convert to Number
+//     let Quantity = parseInt((req.body.amount).toString());
+//     let isAvailable = false;
 
-});
+//     //Determin isAvailable
+//     if(Quantity){
+//         isAvailable = true; 
+//     }
+//     else {
+//         isAvailable = false;
+//     }
+//     //pass in data
+//     const updateUser = await prisma.library.update({
+//         where: {
+//             ISBN: ISBN
+//         },
+//         //Lazy replace everything 
+//         data: {
+//             ISBN: ISBN2,
+//             ItemName: req.body.bookName,
+//             Author: req.body.author,
+//         },
+//     })
+//     .then(() => {
+//         res.redirect('/');
+//     })
+//     .catch(() => {
+//         res.redirect('/');
+//     });
 
-//Update book
-app.post('/updateBook', async(req: Request, res: Response) => {
-    //Convert to bigint
-    let ISBN = BigInt(parseInt((req.body.isbn).toString()));
-    let ISBN2 = BigInt(parseInt((req.body.isbn2).toString()));
-    //Convert to Number
-    let Quantity = parseInt((req.body.amount).toString());
-    let isAvailable = false;
-
-    //Determin isAvailable
-    if(Quantity){
-        isAvailable = true; 
-    }
-    else {
-        isAvailable = false;
-    }
-    //pass in data
-    const updateUser = await prisma.library.update({
-        where: {
-            ISBN: ISBN
-        },
-        //Lazy replace everything 
-        data: {
-            ISBN: ISBN2,
-            ItemName: req.body.bookName,
-            Author: req.body.author,
-        },
-    })
-    .then(() => {
-        res.redirect('/');
-    })
-    .catch(() => {
-        res.redirect('/');
-    });
-
-});
+// });
 
 // app.post('/borrow',(req, res) => {
 //     let ntiId = req.body.ntiId;
