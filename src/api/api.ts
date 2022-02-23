@@ -42,6 +42,12 @@ app.use(cors({
     method:'POST, GET'
 }));
 
+app.use('/login', (req, res) => {
+    res.send({
+      token: 'test123'
+    });
+  });
+
 async function FetchPass(userName,ggpassword) {
     const query = await prisma.login.findUnique({
         where:{
@@ -52,7 +58,7 @@ async function FetchPass(userName,ggpassword) {
         }
     }).then((response) => {
         // console.log(response)
-        const tester =String(response.PassWord);
+        const tester = String(response.PassWord);
         const incomingPassword = String(ggpassword);
       
         if(tester !== incomingPassword) return false;
@@ -82,43 +88,23 @@ app.listen(nodePort, () => {
     console.log("Listening on: " + nodePort);
 });
 
-app.post('/login',bodyparsee, async (req, res) => {
+app.post('/login',bodyparsee, async (req: Request, res: Response) => {
     let username = req.body.id;
     let Hash = MD5(req.body.pass);
- 
-    let dejan = () => {
-        return FetchPass(username, Hash)
+
+        FetchPass(username, Hash)
         .then((response) => {
-           
             if(response){
-            console.log(response)   
-          
-                res.json({
-                  token: 'test123'
-                });
+            console.log(response) 
+            res.status(200).json({redirect: true});
+                // res.json({
+                //   token: 'test123'
+                // }); 
             }
             else {
-               res.json(
-                   {
-                       message :'Invalid credential'
-                   }
-               )
+                res.status(200).json({redirect: false})
             }
         })
-        // .then((response) => {
-        //     console.log(response)
-        // })
-    }
-    await dejan()
-    .then((response) => {
-        res.status(200);
-        res.redirect('http://192.168.198.25:2398' + response)
-
-    })
-    .catch((error) => {
-        res.status(418);
-        console.error(error);
-    })
 });
 // type bookinf={
 //     ISBN:number|undefined;
