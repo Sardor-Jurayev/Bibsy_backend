@@ -71,7 +71,6 @@ model Login {
 
 model Library {
   //The ID assigned by NTI for the item
-  
   Title        String   @unique
   Author       String
   Language     String
@@ -80,7 +79,7 @@ model Library {
   Cover        String   @unique
   Pages        Int
   Publish_Date DateTime
-NTI_s_ID     Int      @unique
+  NTI_s_ID     Int      @unique
   ISBN         BigInt   @id @unique
   //Allows us to assign this item as borrowed in another model
   BorrowDetails BorrowDetails?
